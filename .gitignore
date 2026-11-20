@@ -1,0 +1,5 @@
+/dist/
+/gluper
+/gluper.exe
+*.test
+*.out
