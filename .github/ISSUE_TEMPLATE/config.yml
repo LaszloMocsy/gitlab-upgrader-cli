@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/LaszloMocsy/gluper/security/advisories/new
+    about: Please report security problems privately, not in a public issue.
+  - name: Problems with GitLab itself
+    url: https://docs.gitlab.com/update/
+    about: gluper is unofficial. For GitLab bugs or upgrade problems unrelated to gluper, see GitLab's documentation and support channels.

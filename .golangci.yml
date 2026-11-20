@@ -1,0 +1,54 @@
+version: "2"
+
+run:
+  tests: true
+
+linters:
+  default: standard
+  enable:
+    - depguard
+    - errorlint
+    - forbidigo
+    - gocritic
+    - gosec
+    - misspell
+    - nolintlint
+    - unconvert
+  settings:
+    depguard:
+      rules:
+        # Every external command goes through internal/runner, so that it is
+        # tagged ReadOnly/Mutating and dry runs see exactly what a real run
+        # would do. See internal/runner/doc.go.
+        no-exec-outside-runner:
+          list-mode: lax
+          files:
+            - "$all"
+            - "!**/internal/runner/**"
+          deny:
+            - pkg: os/exec
+              desc: "start external processes through internal/runner only"
+            - pkg: golang.org/x/sys/execabs
+              desc: "start external processes through internal/runner only"
+    forbidigo:
+      forbid:
+        - pattern: ^os\.StartProcess$
+          msg: "start external processes through internal/runner only"
+        - pattern: ^syscall\.(Exec|ForkExec|StartProcess)$
+          msg: "start external processes through internal/runner only"
+      analyze-types: true
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+  exclusions:
+    presets:
+      - std-error-handling
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/LaszloMocsy/gluper

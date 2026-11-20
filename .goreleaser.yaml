@@ -1,0 +1,90 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+version: 2
+
+project_name: gluper
+
+before:
+  hooks:
+    - go mod tidy -diff
+    - go test ./...
+
+builds:
+  - id: gluper
+    main: ./cmd/gluper
+    binary: gluper
+    env:
+      - CGO_ENABLED=0
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/LaszloMocsy/gluper/internal/buildinfo.Version={{ .Version }}
+      - -X github.com/LaszloMocsy/gluper/internal/buildinfo.Commit={{ .FullCommit }}
+      - -X github.com/LaszloMocsy/gluper/internal/buildinfo.Date={{ .CommitDate }}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+archives:
+  - id: gluper
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - LICENSE
+      - README.md
+
+nfpms:
+  - id: packages
+    package_name: gluper
+    file_name_template: "{{ .ConventionalFileName }}"
+    vendor: gluper
+    homepage: https://github.com/LaszloMocsy/gluper
+    maintainer: "László Mócsy <79257589+LaszloMocsy@users.noreply.github.com>"
+    description: Plan and run safe upgrades of self-managed GitLab (unofficial).
+    license: MIT
+    formats: [deb, rpm]
+    bindir: /usr/bin
+    contents:
+      - src: LICENSE
+        dst: /usr/share/doc/gluper/LICENSE
+
+checksum:
+  name_template: checksums.txt
+
+sboms:
+  - artifacts: archive
+
+# Keyless signing through GitHub's OIDC token. Verify with:
+#   cosign verify-blob --bundle checksums.txt.sigstore.json \
+#     --certificate-identity-regexp '^https://github.com/LaszloMocsy/gluper/' \
+#     --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+#     checksums.txt
+signs:
+  - cmd: cosign
+    artifacts: checksum
+    signature: "${artifact}.sigstore.json"
+    args:
+      - sign-blob
+      - --bundle=${signature}
+      - ${artifact}
+      - --yes
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore\\(deps\\):"
+
+release:
+  prerelease: auto
+  footer: |
+    gluper is unofficial and not affiliated with GitLab Inc.
+
+    Verify a download with `gh attestation verify <file> --repo LaszloMocsy/gluper`
+    or with cosign against `checksums.txt.sigstore.json` (see the README).
