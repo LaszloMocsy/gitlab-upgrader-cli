@@ -4,4 +4,7 @@ package config
 
 import "io/fs"
 
-func fileOwner(fs.FileInfo) (uint32, bool) { return 0, false }
+// checkTrusted is a no-op where files have no Unix owner. gluper only
+// requires a trusted config file when running as root, which never happens
+// on Windows (the effective UID there is -1).
+func checkTrusted(string, fs.FileInfo) error { return nil }
