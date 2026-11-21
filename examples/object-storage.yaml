@@ -1,0 +1,6 @@
+# GitLab uploads each backup to object storage itself
+# (gitlab_rails['backup_upload_connection'] in gitlab.rb).
+#
+# gluper then verifies the uploaded object instead of the local archive.
+backup:
+  verify_archive: upload

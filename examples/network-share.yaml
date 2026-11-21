@@ -1,0 +1,14 @@
+# Backups on a mounted network share (NFS or SMB).
+#
+# Requires the backup path to be a mount of the expected filesystem type, so a
+# dropped mount can't silently fill the local disk. Copies of gitlab.rb and
+# gitlab-secrets.json go to the share too, and strict mode blocks the upgrade
+# if they would land on GitLab's own data filesystem.
+backup:
+  target:
+    require_mount: true
+    expected_fs: [nfs4, nfs, cifs, smb3]
+
+config_backup:
+  dir: /mnt/backup/gitlab-config
+  strict: true
