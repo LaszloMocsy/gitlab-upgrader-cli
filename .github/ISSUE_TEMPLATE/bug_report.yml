@@ -1,0 +1,71 @@
+name: Bug report
+description: gluper did something wrong or unexpected.
+labels: [bug, triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please remove hostnames, IPs, tokens and anything else private from what you paste.
+        **Security problems:** don't file them here; use the private report link instead.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you ran, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and output
+      description: The exact gluper command and its full output.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: version
+    attributes:
+      label: Output of `gluper version`
+      render: text
+    validations:
+      required: true
+  - type: dropdown
+    id: install-type
+    attributes:
+      label: GitLab install type
+      options:
+        - Linux package (Omnibus)
+        - Docker / Docker Compose
+        - Helm chart / Operator
+        - Source install
+        - Other / not sure
+        - Not relevant (planning from another machine)
+    validations:
+      required: true
+  - type: input
+    id: gitlab-version
+    attributes:
+      label: GitLab version and edition
+      placeholder: e.g. 18.5.3 CE
+  - type: input
+    id: os
+    attributes:
+      label: Operating system and architecture
+      placeholder: e.g. Ubuntu 22.04 amd64, macOS 15 arm64
+    validations:
+      required: true
+  - type: textarea
+    id: info
+    attributes:
+      label: Output of `gluper info --json` (if available)
+      description: Available from milestone M1 on. Review it for private data before pasting.
+      render: json
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues for this problem.
+          required: true
+        - label: I removed private data (hostnames, IPs, tokens) from what I pasted.
+          required: true

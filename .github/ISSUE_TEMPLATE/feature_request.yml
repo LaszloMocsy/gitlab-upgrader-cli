@@ -1,0 +1,26 @@
+name: Feature request
+description: Suggest an improvement or support for a new setup.
+labels: [enhancement, triage]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe your situation and what is hard today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like gluper to do?
+    validations:
+      required: true
+  - type: textarea
+    id: setup
+    attributes:
+      label: Your setup
+      description: Install type, distro, edition, backup layout, or anything else relevant.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
