@@ -237,7 +237,7 @@ func writeValidation(w io.Writer, l *config.Loaded) error {
 		}
 	}
 	subject, verb := l.File, "is"
-	if !l.FileFound {
+	if !l.FileFound && !fileHasProblems(l) {
 		subject, verb = "The built-in defaults and environment", "are"
 		if l.File != "" && errs == 0 {
 			fmt.Fprintf(w, "No config file at %s.\n", l.File)
@@ -254,6 +254,17 @@ func writeValidation(w io.Writer, l *config.Loaded) error {
 	}
 	_, err := fmt.Fprintln(w, msg)
 	return err
+}
+
+// fileHasProblems reports whether a problem is about the config file itself,
+// such as one that could not be read or was refused.
+func fileHasProblems(l *config.Loaded) bool {
+	for _, p := range l.Problems {
+		if p.Source.Kind == config.SourceFile && p.Source.Name == l.File {
+			return true
+		}
+	}
+	return false
 }
 
 func plural(n int, word string) string {

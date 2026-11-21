@@ -209,7 +209,7 @@ func TestConfigValidateMissingExplicitFile(t *testing.T) {
 	if code := execute(a, []string{"config", "validate", missing}); code != int(exitcode.Error) {
 		t.Fatalf("exit code %d", code)
 	}
-	if !strings.Contains(out.String(), "cannot read config file") {
+	if !strings.Contains(out.String(), "cannot read config file") || !strings.Contains(out.String(), missing+": 1 error") {
 		t.Errorf("output: %s", out)
 	}
 }

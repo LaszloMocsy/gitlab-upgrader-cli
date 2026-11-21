@@ -374,7 +374,7 @@ func TestUntrustedFileRefused(t *testing.T) {
 		Path:           "c.yaml",
 		RequireTrusted: true,
 		open:           fsys.Open,
-		trust:          func(string) error { return errors.New("c.yaml is writable by group or others") },
+		trust:          func(string, fs.FileInfo) error { return errors.New("c.yaml is writable by group or others") },
 	})
 	wantOneProblem(t, l, SeverityError, "refusing to use config file", "writable")
 	if l.Config.Target != "latest" {
@@ -472,5 +472,3 @@ func TestErrSummary(t *testing.T) {
 		t.Errorf("got %v", err)
 	}
 }
-
-var _ fs.FS = fstest.MapFS{}

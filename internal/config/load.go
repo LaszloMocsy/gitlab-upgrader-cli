@@ -116,7 +116,7 @@ type Options struct {
 	// open replaces os.Open in tests.
 	open func(string) (fs.File, error)
 	// trust replaces checkTrusted in tests.
-	trust func(string) error
+	trust func(name string, opened fs.FileInfo) error
 }
 
 // Loaded is the result of Load.
@@ -249,7 +249,12 @@ func (l *loader) loadFile() {
 	}
 	defer f.Close()
 
-	if fi, err := f.Stat(); err == nil && !fi.Mode().IsRegular() {
+	fi, err := f.Stat()
+	if err != nil {
+		l.problem(SeverityError, src, "", "cannot read config file: %v", err)
+		return
+	}
+	if !fi.Mode().IsRegular() {
 		l.problem(SeverityError, src, "", "config file is not a regular file")
 		return
 	}
@@ -258,7 +263,7 @@ func (l *loader) loadFile() {
 		if trust == nil {
 			trust = checkTrusted
 		}
-		if err := trust(name); err != nil {
+		if err := trust(name, fi); err != nil {
 			l.problem(SeverityError, src, "", "refusing to use config file: %v", err)
 			return
 		}
