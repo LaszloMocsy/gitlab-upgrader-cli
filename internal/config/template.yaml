@@ -1,0 +1,112 @@
+# gluper configuration
+#
+# Every value below is the built-in default, so this file changes nothing
+# until you edit it. Delete the lines you don't change if you prefer a short
+# file. Check your edits with:  gluper config validate
+#
+# Precedence, highest first: command-line flags > GLUPER_* environment
+# variables > this file > defaults. Each key has a variable named after its
+# path, for example backup.max_age -> GLUPER_BACKUP_MAX_AGE (lists are
+# comma-separated). `gluper config show` prints every effective value and
+# where it came from.
+#
+# When gluper runs as root, this file and its directory must be owned by root
+# and not writable by group or others.
+
+# Version to upgrade to: latest | next-stop | "19.6" | "19.6.1"
+# Quote versions so YAML keeps them as text.
+target: latest
+
+# Hops per run. 1 is the safe default; "all" runs every hop unattended,
+# waiting for background migrations in between.
+hops_per_run: 1
+
+# Interactive pauses: before_backup, before_install. --yes skips them only
+# when every guard passes.
+checkpoints: [before_backup, before_install]
+
+install:
+  # auto | omnibus   (docker and compose: milestone M6)
+  type: auto
+  # auto | apt | dnf | yum | zypper
+  package_manager: auto
+  # auto | ce | ee   (switching CE -> EE needs --switch-to-ee; EE -> CE is refused)
+  edition: auto
+  # repo   (files, for local .deb/.rpm on air-gapped hosts: milestone M6)
+  source: repo
+
+backup:
+  # Take an application backup before every hop.
+  enabled: true
+  # auto = GitLab's own setting (gitlab_rails['backup_path']), or an absolute path.
+  path: auto
+  # Components to leave out, passed to gitlab-backup as SKIP=, for example
+  # [registry, artifacts].
+  skip: []
+  # default | copy   (passed to gitlab-backup as STRATEGY=)
+  strategy: default
+  # auto | tar | upload | off
+  #   tar    = list the archive and record its checksum
+  #   upload = check the object GitLab uploaded (backup_upload_connection)
+  #   auto   = upload when GitLab uploads backups, otherwise tar
+  verify_archive: auto
+  # Reuse a backup younger than this instead of taking a new one, for
+  # example 24h or 7d. 0 = a fresh backup for every hop.
+  max_age: 0
+  # Free space needed at the backup path: auto (estimated from the previous
+  # backup) or a size such as 50GiB.
+  min_free_space: auto
+  # Tell the package not to take its own database backup during the install,
+  # but only after gluper's backup was verified.
+  skip_package_db_backup: true
+  # Optional assertions about where backups land, for example a network share:
+  #   require_mount: true
+  #   expected_fs: [nfs4, cifs]
+  target:
+    require_mount: false
+    expected_fs: []
+
+# Copies of gitlab.rb, gitlab-secrets.json, the effective config and the
+# dataset used, made before each hop.
+config_backup:
+  # auto = inside the run directory. Point it at another filesystem, ideally
+  # another machine, for real safety.
+  dir: auto
+  # true = block when the copy is on the same filesystem as GitLab's data.
+  strict: false
+
+dataset:
+  # auto (live, then cache, then the copy built into gluper) | file:/path/dataset.json
+  source: auto
+
+upgrade:
+  # Longest wait for background migrations between hops.
+  bbm_wait_timeout: 6h
+  # Longest wait for GitLab to report ready after an install.
+  readiness_timeout: 10m
+  # Hold or lock the package between runs, so a routine system update can't
+  # skip a required stop.
+  hold_package: true
+
+verify:
+  # Opt-in checks after each hop.
+  smoke:
+    readiness: true
+  # Your own manual sign-off items, printed after each hop.
+  checklist: []
+
+# Commands run at fixed points of an upgrade, as root (milestone M4).
+hooks:
+  pre_upgrade: []
+  post_hop: []
+  post_upgrade: []
+  on_failure: []
+
+notify:
+  # URL that receives a JSON message about each run. Empty = off.
+  webhook: ""
+
+# Only allow changes inside this weekly window, for example
+# "Sat 02:00-06:00 UTC", "Mon-Fri 22:00-02:00 Europe/Budapest" or
+# "daily 01:00-05:00". Empty = any time.
+maintenance_window: ""

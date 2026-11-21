@@ -11,7 +11,7 @@ import (
 )
 
 func TestUnsupportedHostCommand(t *testing.T) {
-	root := newRootCommand(&bytes.Buffer{}, &bytes.Buffer{})
+	root := newRootCommand(newApp(&bytes.Buffer{}, &bytes.Buffer{}))
 	root.AddCommand(unsupportedHostCommand("fake-host-cmd"))
 	root.SetArgs([]string{"fake-host-cmd", "--any-flag", "arg"})
 

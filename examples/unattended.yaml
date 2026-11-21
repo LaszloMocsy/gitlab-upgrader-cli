@@ -1,0 +1,10 @@
+# Unattended upgrades from cron or CI.
+#
+# Runs every hop in one go, without interactive checkpoints, and only inside
+# the maintenance window. Guards still block anything unsafe; --yes is still
+# required on the command line.
+hops_per_run: all
+checkpoints: []
+maintenance_window: "Sat 02:00-06:00 UTC"
+notify:
+  webhook: https://ntfy.example/gitlab

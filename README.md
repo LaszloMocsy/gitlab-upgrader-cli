@@ -8,8 +8,8 @@ unsafe upgrades, and runs upgrades that can be resumed, with dry runs at every
 level. Planning also works from macOS and Windows.
 
 > [!WARNING]
-> **Status: pre-alpha.** gluper doesn't inspect or upgrade anything yet. The
-> repository currently holds the project skeleton and the release pipeline.
+> **Status: pre-alpha.** gluper doesn't inspect or upgrade anything yet. So
+> far it has the release pipeline and the `config` commands.
 > Don't run it against production. Follow the
 > [roadmap](#roadmap) for progress.
 
@@ -91,6 +91,33 @@ cosign verify-blob \
   checksums.txt
 sha256sum --ignore-missing -c checksums.txt
 ```
+
+## Configuration
+
+gluper works without a config file: every default is either `auto` (detect
+it) or the conservative choice. To change something, start from the annotated
+defaults:
+
+```sh
+gluper config init            # print every setting with its default and an explanation
+gluper config init --write    # save it to the config file location (mode 0600)
+gluper config validate        # check the file and any GLUPER_* variables
+gluper config show            # every effective value and where it came from
+```
+
+Values are layered, highest precedence first: command-line flags, `GLUPER_*`
+environment variables, the config file, and built-in defaults. Each key has a
+variable named after its path: `backup.max_age` is `GLUPER_BACKUP_MAX_AGE`,
+and lists are comma-separated.
+
+The config file is `/etc/gluper/config.yaml` when gluper runs as root on Linux,
+and `gluper/config.yaml` in the user's config directory otherwise. `--config`
+or `GLUPER_CONFIG` selects another file. When gluper runs as root, the file
+and its directory must be owned by root and not writable by group or others,
+because hooks run as root.
+
+Ready-made profiles for common setups (backups on a network share, GitLab's
+object-storage upload, unattended runs) are in [`examples/`](examples).
 
 ## Exit codes
 
