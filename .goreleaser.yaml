@@ -82,6 +82,11 @@ changelog:
       - "^chore\\(deps\\):"
 
 release:
+  # Releases are created as drafts and published by hand after review
+  # (see CONTRIBUTING.md, "Releasing"). Re-running the workflow for the same
+  # tag replaces the draft instead of failing.
+  draft: true
+  replace_existing_draft: true
   prerelease: auto
   footer: |
     gluper is unofficial and not affiliated with GitLab Inc.

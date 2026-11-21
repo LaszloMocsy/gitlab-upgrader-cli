@@ -73,6 +73,26 @@ and a source URL, plus a test. Adding one doesn't need Go code.
   messages (`feat:`, `fix:`, `docs:`, …). The changelog is built from them.
 - CI must pass on all three operating systems.
 
+## Releasing
+
+Maintainers only.
+
+1. Make sure CI is green on `main`, then tag it: `git tag -a v0.1.0 -m v0.1.0 && git push origin v0.1.0`.
+2. The Release workflow builds, signs and attests everything, and creates a
+   **draft** GitHub release. Drafts are invisible to users, and
+   `releases/latest` (used by the install instructions) skips them. The tag
+   itself is public, though, so `go install …@latest` can resolve to it
+   straight away.
+3. Review the draft: the changelog, the asset list (6 archives, `.deb`/`.rpm`,
+   `checksums.txt`, `checksums.txt.sigstore.json`, SBOMs), and verify one
+   download as described in the README.
+4. Publish the draft. If something is wrong, fix it and re-run the workflow
+   for the same tag (the draft is replaced), or delete the draft and the tag.
+
+Cosign signatures go to the public Rekor transparency log and attestations
+are recorded at build time, so both exist even for a draft that is never
+published. That is expected.
+
 ## Reporting bugs
 
 Use the issue forms. For security problems, follow [SECURITY.md](SECURITY.md)
